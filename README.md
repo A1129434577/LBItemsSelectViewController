@@ -1,0 +1,2 @@
+# LBItemsSelectViewController
+一个可以快速设置icon和title的选择下拉框/下拉菜单，集成自系统的PopoverVC。
