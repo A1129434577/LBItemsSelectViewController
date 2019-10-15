@@ -26,7 +26,7 @@
 -(void)dropDownMenu:(UIBarButtonItem *)item{
     LBItemsSelectViewController *homeMorePopover = [[LBItemsSelectViewController alloc] init];
     homeMorePopover.separatorInset = UIEdgeInsetsMake(0, 15, 0, 15);
-    homeMorePopover.popPC.backgroundColor = [UIColor lightGrayColor];
+    homeMorePopover.popPC.backgroundColor = [UIColor blackColor];
     homeMorePopover.cellHeight = 35;
     homeMorePopover.textColor = [UIColor whiteColor];
     LBItem *item1 = [LBItem itemWithTitle:@"我的消息"];
