@@ -16,8 +16,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong)UIImage *image;
 @end
 
+
+typedef NS_ENUM(NSUInteger, LBItemsSelectContentAlignment) {
+    LBItemsSelectContentAlignmentLeft,
+    LBItemsSelectContentAlignmentCenter,
+    LBItemsSelectContentAlignmentRight,
+};
+
 @interface LBItemsSelectViewController : UIViewController
 @property (nonatomic,strong,readonly)UIPopoverPresentationController *popPC;
+@property (nonatomic,assign)LBItemsSelectContentAlignment contentAlignment;
+@property (nonatomic,assign)UIEdgeInsets contentInset;
 @property (nonatomic,assign)UIEdgeInsets separatorInset;
 @property (nonatomic,assign)CGFloat cellHeight;
 @property (nonatomic,strong)UIFont *font;

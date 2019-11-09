@@ -11,6 +11,8 @@
 @interface LBItemsSelectCell : UITableViewCell
 @property (nonatomic,strong)UIImageView *icon;
 @property (nonatomic,strong)UILabel *titleLabel;
+@property (nonatomic,assign)LBItemsSelectContentAlignment contentAlignment;
+@property (nonatomic,assign)UIEdgeInsets contentInset;
 @end
 
 @implementation LBItemsSelectCell
@@ -28,13 +30,39 @@
 }
 - (void)setFrame:(CGRect)frame{
     [super setFrame:frame];
-    self.icon.frame = CGRectMake(self.layoutMargins.left, self.layoutMargins.top, self.icon.image?CGRectGetHeight(frame)-self.layoutMargins.top-self.layoutMargins.bottom:0, CGRectGetHeight(frame)-self.layoutMargins.top-self.layoutMargins.bottom);
-    self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.icon.frame)+(self.icon.image?5:0), CGRectGetMinY(self.icon.frame), CGRectGetWidth(frame)-CGRectGetMaxX(self.icon.frame)-10, CGRectGetHeight(self.icon.frame));
-    
-    if (self.icon.image) {
-        self.titleLabel.textAlignment = NSTextAlignmentLeft;
-    }else{
-        self.titleLabel.textAlignment = NSTextAlignmentCenter;
+    switch (self.contentAlignment) {
+        case LBItemsSelectContentAlignmentLeft:
+        {
+            CGFloat iconHeight = CGRectGetHeight(frame)-self.contentInset.top-self.contentInset.bottom;
+            self.icon.frame = CGRectMake(self.contentInset.left, self.contentInset.top, self.icon.image?iconHeight:0, iconHeight);
+            CGFloat titleLabelMinX = CGRectGetMaxX(self.icon.frame)+(self.icon.image?5:0);
+            self.titleLabel.frame = CGRectMake(titleLabelMinX, CGRectGetMinY(self.icon.frame), CGRectGetWidth(frame)-titleLabelMinX, iconHeight);
+        }
+            break;
+        case LBItemsSelectContentAlignmentCenter:
+        {
+            CGFloat iconHeight = CGRectGetHeight(frame)-self.contentInset.top-self.contentInset.bottom;
+            CGFloat iconWidth = self.icon.image?iconHeight:0;;
+            CGFloat titleLabelWidth = [self.titleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(frame)-iconWidth-self.contentInset.left-(self.icon.image?5:0), iconHeight)].width;
+            CGFloat contentMinX = (CGRectGetWidth(frame)-iconWidth-titleLabelWidth-(self.icon.image?5:0))/2+self.contentInset.left;
+            
+            self.icon.frame = CGRectMake(contentMinX, self.contentInset.top, iconWidth, iconHeight);
+            CGFloat titleLabelMinX = CGRectGetMaxX(self.icon.frame)+(self.icon.image?5:0);
+            self.titleLabel.frame = CGRectMake(titleLabelMinX, CGRectGetMinY(self.icon.frame), titleLabelWidth, iconHeight);
+        }
+            
+            break;
+        case LBItemsSelectContentAlignmentRight:
+        {
+            CGFloat iconHeight = CGRectGetHeight(frame)-self.contentInset.top-self.contentInset.bottom;
+            CGFloat titleLabelWidth = [self.titleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(frame)-iconHeight-self.contentInset.left-(self.icon.image?5:0), iconHeight)].width;
+            self.titleLabel.frame = CGRectMake(CGRectGetWidth(frame)-titleLabelWidth, self.contentInset.top, titleLabelWidth, iconHeight);
+            self.icon.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame)-5-iconHeight, CGRectGetMinY(self.titleLabel.frame), iconHeight, iconHeight);
+        }
+            break;
+            
+        default:
+            break;
     }
 }
 @end
@@ -51,6 +79,12 @@
         self.modalPresentationStyle = UIModalPresentationPopover;
         _popPC = self.popoverPresentationController;
         _popPC.delegate = self;
+        
+        _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
+        _tableView.backgroundColor = [UIColor clearColor];
+        _tableView.tableFooterView = [[UIView alloc] init];
     }
     return self;
 }
@@ -58,23 +92,28 @@
     return UIModalPresentationNone;//不适配
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
-}
-- (void)setSeparatorInset:(UIEdgeInsets)separatorInset{
-    _separatorInset = separatorInset;
-    [_tableView reloadData];
-}
--(void)viewDidLayoutSubviews{
-    [super viewDidLayoutSubviews];
-    _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-    _tableView.delegate = self;
-    _tableView.dataSource = self;
-    _tableView.backgroundColor = [UIColor clearColor];
-    _tableView.tableFooterView = [[UIView alloc] init];
+- (void)loadView {
+    [super loadView];
+    
     [self.view addSubview:_tableView];
 }
+-(void)viewWillLayoutSubviews{
+    [super viewWillLayoutSubviews];
+    _tableView.frame = self.view.bounds;
+}
+- (void)setContentInset:(UIEdgeInsets)contentInset{
+    _contentInset = contentInset;
+    [_tableView reloadData];
+}
+- (void)setContentAlignment:(LBItemsSelectContentAlignment)contentAlignment{
+    _contentAlignment = contentAlignment;
+    [_tableView reloadData];
+}
+-(void)setSeparatorInset:(UIEdgeInsets)separatorInset{
+    _separatorInset = separatorInset;
+    _tableView.separatorInset = separatorInset;
+}
+
 - (void)setCellHeight:(CGFloat)cellHeight{
     _cellHeight = cellHeight;
     [_tableView reloadData];
@@ -105,10 +144,11 @@
         cell.textLabel.font = [UIFont systemFontOfSize:12];
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
     }
-    cell.separatorInset = self.separatorInset;
+    cell.contentAlignment = self.contentAlignment;
+    cell.contentInset = self.contentInset;
     
-    self.font?cell.titleLabel.font = self.font:NULL;
-    self.textColor?cell.titleLabel.textColor = self.textColor:NULL;
+    self.font?cell.titleLabel.font=self.font:NULL;
+    self.textColor?cell.titleLabel.textColor=self.textColor:NULL;
     cell.titleLabel.text = [_items[indexPath.row] title];
     if ([_items[indexPath.row] respondsToSelector:@selector(image)]) {
         cell.icon.image = [_items[indexPath.row] image];
