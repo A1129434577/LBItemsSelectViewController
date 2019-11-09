@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "LBItemsSelectViewController"
-  spec.version      = "0.0.1"
+  spec.version      = "0.0.2"
   spec.summary      = "下拉框/下拉菜单"
   spec.description  = "一个可以快速设置icon和title的选择下拉框/下拉菜单，集成自系统的PopoverVC。"
   spec.homepage     = "https://github.com/A1129434577/LBItemsSelectViewController"
