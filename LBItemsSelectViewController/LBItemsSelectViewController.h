@@ -25,15 +25,17 @@ typedef NS_ENUM(NSUInteger, LBItemsSelectContentAlignment) {
 
 @interface LBItemsSelectViewController : UIViewController
 @property (nonatomic,strong,readonly)UIPopoverPresentationController *popPC;
+@property (nonatomic,strong,readonly)UITableView *tableView;
 @property (nonatomic,assign)LBItemsSelectContentAlignment contentAlignment;
 @property (nonatomic,assign)UIEdgeInsets contentInset;
 @property (nonatomic,assign)UIEdgeInsets separatorInset;
 @property (nonatomic,assign)CGFloat cellHeight;
 @property (nonatomic,strong)UIFont *font;
 @property (nonatomic,strong)UIColor *textColor;
+@property (nonatomic,strong)UIColor *selectionColor;
+@property (nonatomic,strong)NSObject<LBSelectItemsProtocol> *selectedItem;
 @property (nonatomic,strong)NSArray<NSObject<LBSelectItemsProtocol> *> *items;
-@property (nonatomic,copy)void(^selectedItem)(NSObject<LBSelectItemsProtocol> *item);
-
+@property (nonatomic,copy)void(^selectedItemBlock)(NSObject<LBSelectItemsProtocol> *item);
 @end
 
 @interface LBItem : NSObject <LBSelectItemsProtocol>

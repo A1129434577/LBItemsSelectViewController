@@ -68,7 +68,6 @@
 @end
 
 @interface LBItemsSelectViewController ()<UITableViewDataSource,UITableViewDelegate,UIPopoverPresentationControllerDelegate>
-@property (nonatomic,strong)UITableView *tableView;
 @end
 
 @implementation LBItemsSelectViewController
@@ -143,15 +142,23 @@
 
         cell.textLabel.font = [UIFont systemFontOfSize:12];
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
+        
+        cell.contentAlignment = self.contentAlignment;
+        cell.contentInset = self.contentInset;
+        
+        self.font?cell.titleLabel.font=self.font:NULL;
+        
     }
-    cell.contentAlignment = self.contentAlignment;
-    cell.contentInset = self.contentInset;
+    NSObject<LBSelectItemsProtocol> *item = _items[indexPath.row];
     
-    self.font?cell.titleLabel.font=self.font:NULL;
-    self.textColor?cell.titleLabel.textColor=self.textColor:NULL;
-    cell.titleLabel.text = [_items[indexPath.row] title];
+    if ([item isEqual:_selectedItem]) {
+        self.selectionColor?cell.titleLabel.textColor=self.selectionColor:NULL;
+    }else{
+        self.textColor?cell.titleLabel.textColor=self.textColor:NULL;
+    }
+    cell.titleLabel.text = item.title;
     if ([_items[indexPath.row] respondsToSelector:@selector(image)]) {
-        cell.icon.image = [_items[indexPath.row] image];
+        cell.icon.image = item.image;
     }
     return cell;
 }
@@ -160,7 +167,7 @@
     typeof(self) __weak weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf dismissViewControllerAnimated:YES completion:^{
-            weakSelf.selectedItem?weakSelf.selectedItem(weakSelf.items[indexPath.row]):NULL;
+            weakSelf.selectedItemBlock?weakSelf.selectedItemBlock(weakSelf.items[indexPath.row]):NULL;
         }];
     });
     
